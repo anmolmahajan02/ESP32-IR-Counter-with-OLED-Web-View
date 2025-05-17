@@ -65,7 +65,4 @@ The web page shows the live count and auto-refreshes every 100ms.
 ![image](https://github.com/user-attachments/assets/dd1af003-ef0d-4e68-ba74-8fa1d621ae11)
 
 
----
-
-## 📁 File Structure
 
