@@ -1,0 +1,71 @@
+//VCC-->3V3
+//SDA-->21
+//SCK-->22
+
+
+#include <Arduino.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define OLED_RESET     -1
+
+int irPin = 23;         // IR sensor connected to GPIO 23
+int count = 0;          // Counter for object passes
+bool objectDetected = false;
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+void setup() {
+  pinMode(irPin, INPUT);    // Set IR pin as input
+
+  Wire.begin(21, 22); // SDA, SCL for ESP32
+  Serial.begin(115200);
+
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println(F("SSD1306 initialization failed"));
+    while (true);
+  }
+
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.println("IR Counter Ready");
+  display.display();
+  delay(1000);
+}
+
+void loop() {
+  int sensorValue = digitalRead(irPin);
+
+  // Object detected (IR beam broken)
+  if (sensorValue == LOW && !objectDetected) {
+    count++;
+    objectDetected = true;
+    Serial.print("Object Passed. Count: ");
+    Serial.println(count);
+
+    display.clearDisplay();
+    display.setTextSize(2);
+    display.setCursor(0, 0);
+    display.println("Count:");
+    display.setTextSize(3);
+    display.setCursor(32, 32);
+    display.println(count);
+    display.display();
+  }
+  
+
+  // Reset detection when object moves away
+  if (sensorValue == HIGH) {
+    objectDetected = false;
+  }
+
+  
+
+  delay(30); // Debounce delay
+
+}
